@@ -8,7 +8,7 @@ task :deploy do
 
   # Copy the build documentation to the server.
   puts "Transfering sphinx build to vandpibe.bjrnskov.dk"
-  system "rsync -vcqPr --delete _build/singlehtml/* piglet:www/vandpibe/web"
+  system "rsync -vcqPr --delete _build/singlehtml/* hb@tigger.bjrnskov.dk:www/vandpibe-bjrnskov-dk"
 end
 
 task :default => :build
