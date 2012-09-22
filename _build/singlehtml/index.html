@@ -1,0 +1,338 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Vandpibe 0.0.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.0.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="None" href="index.html#document-index" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li><a href="index.html#document-index">Vandpibe 0.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="welcome-to-vandpibe-s-documentation">
+<h1>Welcome to Vandpibe&#8217;s documentation!<a class="headerlink" href="#welcome-to-vandpibe-s-documentation" title="Permalink to this headline">¶</a></h1>
+<p>Vandpibe is a collection of Componennt and Bridge&#8217;s for use with Symfony Component or projects that have something
+in common.</p>
+<div class="toctree-wrapper compound">
+<span id="document-auto-login"></span><div class="section" id="autologin">
+<h2>AutoLogin<a class="headerlink" href="#autologin" title="Permalink to this headline">¶</a></h2>
+<p>AutoLogin build upon another great library <a class="reference external" href="http://github.com/jmikola/autologin">Jmikola AutoLogin</a>. Which adds
+AutoLogin capabilities to Symfony&#8217;s Security component.</p>
+<p>AutoLogin adds generation of secure auto-login urls. The urls generated is base64 encoded and looks like this</p>
+<div class="highlight-text"><div class="highlight"><pre>c29tZXRoaW5nbGlrZXRoaXNpc2F3ZXNvbWVhbmR2ZXJ5dmVybG9uZzkwNzI4OTYyNzR0aWhhZGs3OTAyMzk0Mjk4NzIz
+</pre></div>
+</div>
+<div class="section" id="basic-usage">
+<h3>Basic usage<a class="headerlink" href="#basic-usage" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">Vandpibe\AutoLogin\Generator</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Vandpibe\AutoLogin\Hasher</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Symfony\Component\Security\Core\User\UserInterface</span><span class="p">;</span>
+
+<span class="nv">$user</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">User</span><span class="p">();</span>
+
+<span class="nv">$hasher</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Hasher</span><span class="p">(</span><span class="s1">&#39;sharedsecret&#39;</span><span class="p">);</span>
+<span class="nv">$generator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Generator</span><span class="p">(</span><span class="nv">$hasher</span><span class="p">);</span>
+
+<span class="k">print</span> <span class="nv">$generator</span><span class="o">-&gt;</span><span class="na">generate</span><span class="p">(</span><span class="nv">$user</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="twig-extension">
+<h3>Twig Extension<a class="headerlink" href="#twig-extension" title="Permalink to this headline">¶</a></h3>
+<p>As auto-login&#8217;s mostly are done from templates there is a Twig extension which helps with generating the full url.
+The extension requires Symfony&#8217;s Routing component for generating the actual url.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$twig</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Twig_Environment</span><span class="p">();</span>
+<span class="nv">$twig</span><span class="o">-&gt;</span><span class="na">addExtension</span><span class="p">(</span><span class="k">new</span> <span class="nx">AutoLoginExtension</span><span class="p">(</span><span class="nv">$generator</span><span class="p">,</span> <span class="nv">$urlGenerator</span><span class="p">));</span>
+</pre></div>
+</div>
+<div class="highlight-jinja"><div class="highlight"><pre><span class="c">{# Returns an absolute url with the auto_login generated string appended #}</span><span class="x"></span>
+<span class="x">&lt;a href=&quot;</span><span class="cp">{{</span> <span class="nv">auto_login_url</span><span class="o">(</span><span class="nv">app.user</span><span class="o">,</span> <span class="s1">&#39;vandpibe_user_edit&#39;</span><span class="o">)</span> <span class="cp">}}</span><span class="x">&quot;&gt;Edit profile&lt;/a&gt;</span>
+
+<span class="c">{# Returns the auto_login generated string. #}</span><span class="x"></span>
+<span class="cp">{{</span> <span class="nv">auto_login</span><span class="o">(</span><span class="nv">user</span><span class="o">,</span> <span class="m">86400</span><span class="o">)</span> <span class="cp">}}</span><span class="x"></span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="silex-and-cilex-integration">
+<h3>Silex and Cilex integration<a class="headerlink" href="#silex-and-cilex-integration" title="Permalink to this headline">¶</a></h3>
+<p>For Silex and Cilex there is a ServiceProvider. Which adds a Generator, Hasher and enables the TwigExtension if Twig is available.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="k">use</span> <span class="nx">Silex\Application</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Vandpibe\AutoLogin\Silex\AutoLoginServiceProvider</span><span class="p">;</span>
+
+<span class="nv">$app</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Application</span><span class="p">();</span>
+<span class="nv">$app</span><span class="o">-&gt;</span><span class="na">register</span><span class="p">(</span><span class="k">new</span> <span class="nx">AutoLoginServiceProvider</span><span class="p">(),</span> <span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;vandpibe.auto_login.secret&#39;</span> <span class="o">=&gt;</span> <span class="s1">&#39;a-very-shared-secret&#39;</span><span class="p">,</span>
+<span class="p">));</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">For the Cilex version just substitute Silex for Cilex in the above example</p>
+</div>
+</div>
+<div class="section" id="id1">
+<h3>Jmikola AutoLogin<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Jmikola&#8217;s AutoLogin componenent have a <tt class="docutils literal"><span class="pre">AutoLoginUserProviderInterface</span></tt>. <tt class="docutils literal"><span class="pre">Vandpibe\AutoLogin\Security\UserProvider</span></tt> is a concrete
+implementation of that which wraps a normal <tt class="docutils literal"><span class="pre">Symfony\Component\Security\User\Core\UserProviderInterface</span></tt> implementation.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">Vandpibe\AutoLogin\UserProvider</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Vandpibe\AutoLogin\Generator</span><span class="p">;</span>
+<span class="k">use</span> <span class="nx">Symfony\Component\Security\Core\User\UserProviderInterface</span><span class="p">;</span>
+
+<span class="nv">$provider</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">UserProvider</span><span class="p">(</span><span class="nx">UserProviderInterface</span> <span class="nv">$provider</span><span class="p">,</span> <span class="nx">Generator</span> <span class="nv">$generator</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+</div>
+<span id="document-generator"></span><div class="section" id="generator">
+<h2>Generator<a class="headerlink" href="#generator" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="heroku-like-names">
+<h3>Heroku like names<a class="headerlink" href="#heroku-like-names" title="Permalink to this headline">¶</a></h3>
+<p>If you have ever played with Sinatra or Ruby on Rails you have proberly heard of Heroku which names
+it servers with fun names like <tt class="docutils literal"><span class="pre">red-flower-87</span></tt>. And as it turns out this is hugely useful for
+autogenerated usernames or passwords.</p>
+<div class="section" id="example">
+<h4>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h4>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">Vandpibe\Generator\HerokuGenerator</span><span class="p">;</span>
+
+<span class="nv">$generator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">HerokuGenerator</span><span class="p">();</span>
+<span class="k">print</span> <span class="nv">$generator</span><span class="o">-&gt;</span><span class="na">generate</span><span class="p">();</span>
+</pre></div>
+</div>
+<p>The above example will output a name in that style. The format consistest of a Adjective, a Noun and a random number
+between 1 and 100</p>
+</div>
+</div>
+</div>
+<span id="document-form"></span><div class="section" id="form">
+<h2>Form<a class="headerlink" href="#form" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="nulltodatetimetransformer">
+<h3>NullToDateTimeTransformer<a class="headerlink" href="#nulltodatetimetransformer" title="Permalink to this headline">¶</a></h3>
+<p>When binding a form with <tt class="docutils literal"><span class="pre">null</span></tt> and the form have a <tt class="docutils literal"><span class="pre">date</span></tt> type field it will try and pass <tt class="docutils literal"><span class="pre">null</span></tt> to the model.
+This is solved by converting <tt class="docutils literal"><span class="pre">null</span></tt> into a <tt class="docutils literal"><span class="pre">DateTime</span></tt> using the current timestamp.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">Vandpibe\Form\DataTransformer\NullToDateTimeTransformer</span><span class="p">;</span>
+
+<span class="nv">$builder</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;dateField&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">addModelTransformer</span><span class="p">(</span><span class="k">new</span> <span class="nx">NullToDateTimeTransformer</span><span class="p">());</span>
+</pre></div>
+</div>
+<p>This can be cumbersome to do for every date field if you want it system wide. Therefor there is also a <tt class="docutils literal"><span class="pre">FormTypeExtensionInterface</span></tt>
+implementation which can be used by adding <tt class="docutils literal"><span class="pre">Resources/config/services.xml</span></tt> to your Dependency Injection container. If it is absolutely
+necesarry it can be used standalone.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">Vandpibe\Form\Extension\DateTypeExtension</span><span class="p">;</span>
+
+<span class="nv">$extension</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DateTypeExtension</span><span class="p">();</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="encodertransfomer">
+<h3>EncoderTransfomer<a class="headerlink" href="#encodertransfomer" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">EncoderTransformer</span></tt> will automatically encode the value that is being reverse transformer with the correct
+<tt class="docutils literal"><span class="pre">PasswordEncoderInterface</span></tt> through <tt class="docutils literal"><span class="pre">EncoderFactoryInterface</span></tt>.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$builder</span><span class="o">-&gt;</span><span class="na">get</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">)</span><span class="o">-&gt;</span><span class="na">addModelTransformer</span><span class="p">(</span><span class="k">new</span> <span class="nx">EncoderTransformer</span><span class="p">(</span><span class="nv">$encoderFactory</span><span class="p">,</span> <span class="nv">$user</span><span class="p">));</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="authenticationsubscriber">
+<h3>AuthenticationSubscriber<a class="headerlink" href="#authenticationsubscriber" title="Permalink to this headline">¶</a></h3>
+<p>When using the full stack Symfony2 framework the Security login form is not rendered as a form. This can luckily be changed
+quite easily.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="c1">// Assuming you have access to the $session object and a $formBuilder instance</span>
+<span class="nv">$subscriber</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AuthenticationSubscriber</span><span class="p">(</span><span class="nv">$session</span><span class="p">);</span>
+<span class="nv">$formBuilder</span><span class="o">-&gt;</span><span class="na">addEventSubscriber</span><span class="p">(</span><span class="nv">$subscriber</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="authenticationtype">
+<h3>AuthenticationType<a class="headerlink" href="#authenticationtype" title="Permalink to this headline">¶</a></h3>
+<p>Can be used as a replacement for doing the same security check for password etc.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">class</span> <span class="nc">SecurityController</span> <span class="k">extends</span> <span class="nx">Controller</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">function</span> <span class="nf">loginAction</span><span class="p">(</span><span class="nx">Request</span> <span class="nv">$request</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="nv">$form</span> <span class="o">=</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">createForm</span><span class="p">(</span><span class="k">new</span> <span class="nx">AuthenticationType</span><span class="p">(</span><span class="nv">$request</span><span class="o">-&gt;</span><span class="na">getSession</span><span class="p">()));</span>
+
+        <span class="k">return</span> <span class="nv">$this</span><span class="o">-&gt;</span><span class="na">render</span><span class="p">(</span><span class="s1">&#39;SomeBundle:Security:login.html.twig&#39;</span><span class="p">,</span> <span class="k">array</span><span class="p">(</span>
+            <span class="s1">&#39;form&#39;</span> <span class="o">=&gt;</span> <span class="nv">$form</span><span class="o">-&gt;</span><span class="na">createView</span><span class="p">(),</span>
+        <span class="p">));</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<span id="document-validator"></span><div class="section" id="validator">
+<h2>Validator<a class="headerlink" href="#validator" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="blacklist-validator">
+<h3>Blacklist Validator<a class="headerlink" href="#blacklist-validator" title="Permalink to this headline">¶</a></h3>
+<p><cite>Blacklist</cite> is a simple constraint and validator for Symfony Validator component. It makes sure the submitted
+value is not part of the blacklist.</p>
+<p>A blacklist can be useful for making sure your urls are not used as usernames. <a class="reference external" href="http://www.quora.com/How-do-sites-prevent-vanity-URLs-from-colliding-with-future-features">See more on Quora</a></p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nv">$constraint</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Blacklist</span><span class="p">(</span><span class="k">array</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="s1">&#39;Blacklist 1&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Blacklist 2&#39;</span><span class="p">,</span>
+<span class="p">));</span>
+
+<span class="nv">$validator</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">BlacklistValidator</span><span class="p">();</span>
+<span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">initialize</span><span class="p">(</span><span class="nv">$context</span><span class="p">);</span>
+<span class="nv">$validator</span><span class="o">-&gt;</span><span class="na">validate</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="nv">$constraint</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>It can also be used with Symfony2 validation config as a Annotation like.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="k">use</span> <span class="nx">Vandpibe\Validator\Constraint\Blacklist</span><span class="p">;</span>
+
+<span class="k">class</span> <span class="nc">Entity</span>
+<span class="p">{</span>
+    <span class="sd">/**</span>
+<span class="sd">     * @Blacklist({ &quot;blacklist 1&quot;, &quot;blacklist 2&quot; })</span>
+<span class="sd">     */</span>
+    <span class="k">protected</span> <span class="nv">$var</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<span id="document-security"></span><div class="section" id="security">
+<h2>Security<a class="headerlink" href="#security" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="anonymousvoter">
+<h3>AnonymousVoter<a class="headerlink" href="#anonymousvoter" title="Permalink to this headline">¶</a></h3>
+<p><tt class="docutils literal"><span class="pre">AnonymousVoter</span></tt> only allows anonymous users or non-authenticated users access to a resource.</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+<span class="nv">$accessDecisionManager</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">AccessDecisionManager</span><span class="p">(</span><span class="k">array</span><span class="p">(</span>
+    <span class="k">new</span> <span class="nx">AnonymousVoter</span><span class="p">(),</span>
+<span class="p">));</span>
+</pre></div>
+</div>
+<p>If you are using Symfony2 and <tt class="docutils literal"><span class="pre">Resources/config/services.xml</span></tt> have been loaded into the dependency injection container.</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="c1"># security.yml</span>
+<span class="l-Scalar-Plain">security</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">access_control</span><span class="p-Indicator">:</span>
+        <span class="p-Indicator">-</span> <span class="p-Indicator">{</span> <span class="nv">path</span><span class="p-Indicator">:</span> <span class="nv">/login</span><span class="p-Indicator">,</span> <span class="nv">roles</span><span class="p-Indicator">:</span> <span class="p-Indicator">[</span><span class="nv">IS_ANONYMOUS</span><span class="p-Indicator">]</span> <span class="p-Indicator">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="bcrypt-encoder">
+<h3>BCrypt Encoder<a class="headerlink" href="#bcrypt-encoder" title="Permalink to this headline">¶</a></h3>
+<p>We all know that BCrypt is the best and if you are not so sure about that see &#8220;<a class="reference external" href="http://yorickpeterse.com/articles/use-bcrypt-fool">Use BCrypt Fool!</a>&#8220;</p>
+<div class="highlight-php"><div class="highlight"><pre><span class="cp">&lt;?php</span>
+
+<span class="nv">$encoder</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">BcryptPasswordEncoder</span><span class="p">(</span><span class="nv">$cost</span> <span class="o">=</span> <span class="mi">5</span><span class="p">);</span>
+
+<span class="c1">// Encode password. The second argument is the $salt which is ignored but</span>
+<span class="c1">// part of the PasswordEncoderInterface definition</span>
+<span class="nv">$encoder</span><span class="o">-&gt;</span><span class="na">encodePassword</span><span class="p">(</span><span class="s1">&#39;password&#39;</span><span class="p">,</span> <span class="k">null</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>If you are using Symfony2 and <tt class="docutils literal"><span class="pre">Resources/config/services.xml</span></tt> have been loaded into the dependency injection container.</p>
+<div class="highlight-yaml"><div class="highlight"><pre><span class="c1"># security.yml</span>
+<span class="l-Scalar-Plain">security</span><span class="p-Indicator">:</span>
+    <span class="l-Scalar-Plain">encoders</span><span class="p-Indicator">:</span>
+        <span class="l-Scalar-Plain">Vandpibe\VandpibeBundle\Model\User</span><span class="p-Indicator">:</span> <span class="p-Indicator">{</span> <span class="nv">id</span><span class="p-Indicator">:</span> <span class="nv">vandpibe.security.encoder.bcrypt</span> <span class="p-Indicator">}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html#document-index">Table Of Contents</a></h3>
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-auto-login">AutoLogin</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#basic-usage">Basic usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#twig-extension">Twig Extension</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#silex-and-cilex-integration">Silex and Cilex integration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#id1">Jmikola AutoLogin</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-generator">Generator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#heroku-like-names">Heroku like names</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-form">Form</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#nulltodatetimetransformer">NullToDateTimeTransformer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#encodertransfomer">EncoderTransfomer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#authenticationsubscriber">AuthenticationSubscriber</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#authenticationtype">AuthenticationType</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-validator">Validator</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#blacklist-validator">Blacklist Validator</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="index.html#document-security">Security</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="index.html#anonymousvoter">AnonymousVoter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#bcrypt-encoder">BCrypt Encoder</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li><a href="index.html#document-index">Vandpibe 0.0.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+    </div>
+  </body>
+</html>
